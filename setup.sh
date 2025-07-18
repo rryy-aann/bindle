@@ -1,20 +1,13 @@
-set -e  # stop on error
+#!/bin/bash
+set -e
 
 echo "Installing frontend dependencies..."
 cd frontend
-if [ -f package.json ]; then
-  npm install
-else
-  echo "No package.json found in frontend/"
-fi
+npm install || echo "Frontend install failed."
 
 echo "Installing backend dependencies..."
 cd ../backend
-if [ -f package.json ]; then
-  npm install
-else
-  echo "No package.json found in backend/"
-fi
+npm install || echo "Backend install failed."
 
 echo "✅ All done."
 
