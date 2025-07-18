@@ -2,11 +2,11 @@
 
 echo "📦 Installing frontend dependencies..."
 cd frontend
-pnpm install
+npm install
 
 echo "📦 Installing backend dependencies..."
 cd ../backend
-pnpm install
+npm install
 
 echo "✅ Setup complete."
 
