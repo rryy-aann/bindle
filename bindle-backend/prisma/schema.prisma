@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  username     String    @unique
+  name         String?
+  password     String
+  displayName  String
+  xp           Int       @default(0)
+  level        Int       @default(1)
+  coinBalance  Int       @default(0)
+  isAdmin      Boolean   @default(false)
+  isSeller     Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  userAchievements UserAchievement[]
+  posts        Post[]
+  comments     Comment[]
+  listings     Listing[]
+  transactions Transaction[] @relation("BuyerTransactions")
+  sales        Transaction[] @relation("SellerTransactions")
+  dealsClaimed DealClaim[]
+  library      Library[]
+  avatarUrl    String?
+
+}
+
+model Book {
+  id           Int       @id @default(autoincrement())
+  title        String
+  author       String
+  isbn         String?
+  description  String?
+  imageUrl     String?
+  createdAt    DateTime  @default(now())
+
+  listings     Listing[]
+  deals        Deal[]          // 🔧 fixed: multiple deals can link to a book
+  libraries    Library[]
+}
+
+model Listing {
+  id        Int      @id @default(autoincrement())
+  price     Float
+  condition String
+  available Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  seller    User     @relation(fields: [sellerId], references: [id])
+  sellerId  Int
+
+  book      Book     @relation(fields: [bookId], references: [id])
+  bookId    Int
+
+  imageUrl  String?
+
+
+  transactions Transaction[]
+}
+
+model Transaction {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  amount     Float
+  stripeId   String
+  status     String   // pending, complete, refunded, etc.
+
+  buyer      User     @relation("BuyerTransactions", fields: [buyerId], references: [id])
+  buyerId    Int
+
+  seller     User     @relation("SellerTransactions", fields: [sellerId], references: [id])
+  sellerId   Int
+
+  listing    Listing  @relation(fields: [listingId], references: [id])
+  listingId  Int
+}
+
+model Post {
+  id         Int       @id @default(autoincrement())
+  content    String
+  createdAt  DateTime  @default(now())
+  author     User      @relation(fields: [authorId], references: [id])
+  authorId   Int
+  comments   Comment[]
+  type       PostType  @default(SOCIAL) // SOCIAL, BLOG
+
+  @@index([type])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    Int
+}
+
+model Deal {
+  id         Int      @id @default(autoincrement())
+  title      String
+  description String?
+  coinCost   Int
+  active     Boolean  @default(true)
+  book       Book     @relation(fields: [bookId], references: [id])
+  bookId     Int
+  createdAt  DateTime @default(now())
+
+  claims     DealClaim[]
+}
+
+model DealClaim {
+  id       Int      @id @default(autoincrement())
+  deal     Deal     @relation(fields: [dealId], references: [id])
+  dealId   Int
+  user     User     @relation(fields: [userId], references: [id])
+  userId   Int
+  claimedAt DateTime @default(now())
+}
+
+model Library {
+  id       Int    @id @default(autoincrement())
+  status   LibraryStatus
+  user     User   @relation(fields: [userId], references: [id])
+  userId   Int
+  book     Book   @relation(fields: [bookId], references: [id])
+  bookId   Int
+
+  @@unique([userId, bookId])
+}
+
+model Achievement {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  icon        String?  // e.g., emoji or image URL
+  createdAt   DateTime @default(now())
+
+  userAchievements UserAchievement[]
+}
+
+model UserAchievement {
+  id             Int          @id @default(autoincrement())
+  user           User         @relation(fields: [userId], references: [id])
+  userId         Int
+  achievement    Achievement  @relation(fields: [achievementId], references: [id])
+  achievementId  Int
+  awardedAt      DateTime     @default(now())
+
+  @@unique([userId, achievementId])
+}
+
+
+enum LibraryStatus {
+  READ
+  WANT_TO_READ
+}
+
+enum PostType {
+  SOCIAL
+  BLOG
+}

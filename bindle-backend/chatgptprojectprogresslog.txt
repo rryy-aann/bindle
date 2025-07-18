@@ -1,0 +1,69 @@
+=== Iteration: 2025-07-14b ===
+
+Changes Completed:
+- Implemented and tested secure, httpOnly, SameSite=strict cookie-based auth flow end-to-end
+- Verified working login, logout, and protected `/api/users/me` route using `authenticate` middleware
+- Replaced old `authenticateToken` with new `authMiddleware` that reads token from cookies
+- Refactored `users.ts` to use the new middleware on all routes
+- Hardened express server to prevent "Unexpected end of JSON input" errors on GET/HEAD requests
+- Fixed CORS origin config to allow cookies in dev tools like Thunder Client
+- Resolved mismatch error due to `/api/user/me` typo (correct path is `/api/users/me`)
+
+Suggested Next Steps:
+- Add frontend login/logout functionality using `credentials: 'include'`
+- Protect listing creation, comments, posts, DMs, etc. with `authenticate` middleware
+- Add a token refresh system or rolling cookie expiration (optional)
+- In production: lock CORS origin and enforce HTTPS (`secure: true`)
+
+=== Iteration: 2025-07-15a ===
+Changes Completed:
+
+Successfully debugged and ran npx prisma migrate reset with two migrations applied
+
+Fixed prisma/seed.ts error by adding missing username field to the User model and regenerating client
+
+Verified seed.ts inserts users and books into PostgreSQL DB correctly
+
+Switched from Thunder Client to PowerShell curl.exe due to file upload limitations in free tier
+
+Wrote and tested multipart upload request via PowerShell using curl.exe and a valid JWT token
+
+Identified and resolved AWS S3 AccessControlListNotSupported error by removing ACL: 'public-read' from upload params
+
+Confirmed file upload works successfully via /api/upload endpoint and image appears at S3-hosted URL
+
+Suggested Next Steps:
+
+Connect uploaded image URL to book listing creation route
+
+Add frontend image upload UI using <input type="file"> and fetch() with FormData
+
+Prevent unauthorized uploads by requiring login (authenticate middleware)
+
+Add metadata validation for file types (e.g. JPEG, PNG) and max file size
+
+Clean up /uploads route logging and error handling for production readiness
+
+=== Iteration: 2025-07-15b ===
+Changes Completed:
+
+Added avatarUrl field to User model in schema.prisma
+
+Created and applied new Prisma migration: add_avatar_to_user
+
+Regenerated Prisma client to fix TypeScript error on unknown property
+
+Updated PATCH /api/users/me route to accept avatarUrl from request body
+
+Successfully tested avatar update with real image URL from S3:
+https://bindle-uploads.s3.us-east-2.amazonaws.com/d311539f-ecc4-4ee0-9ede-8ac77a702f83.jpg
+
+Verified avatarUrl appears in returned user object and database
+
+Suggested Next Steps:
+
+Create frontend UI for avatar upload using <input type="file"> and S3 upload
+
+Autofill avatar on profile page from DB value
+
+Add validation (image type, size, URL safety) if needed

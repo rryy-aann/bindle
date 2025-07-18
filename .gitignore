@@ -1,0 +1,47 @@
+# === General ===
+.env
+.env.*       # Any environment files (optional)
+.DS_Store
+Thumbs.db
+*.log
+*.tsbuildinfo
+
+# === OS / Editor Files ===
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# === Dependency directories ===
+**/node_modules/
+
+# === Frontend (Next.js, Vite, etc) ===
+frontend/.next/
+frontend/out/
+frontend/.turbo/
+frontend/coverage/
+frontend/public/build/
+frontend/build/
+
+# === Backend (Express, Prisma) ===
+backend/dist/
+backend/build/
+backend/coverage/
+backend/.env
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+backend/migrations/
+
+# === Logs ===
+logs/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# === Optional: lock out large asset files ===
+*.zip
+*.tar.gz
+*.7z
+*.bak
+*.old
+*.orig

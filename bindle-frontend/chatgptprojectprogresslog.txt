@@ -1,0 +1,17 @@
+=== Iteration: 2025-07-15a ===
+
+Changes Completed:
+- Set up clean Next.js frontend project in /bindle-frontend using App Router and Tailwind CSS
+- Connected frontend to backend with working CORS, cookies, and port management
+- Built functional /login page with POST request to backend + credential-based cookie handling
+- Implemented /profile page that fetches and displays user data from /api/users/me
+- Created and verified secure JWT-based auth flow (login sets token, backend middleware verifies, profile pulls)
+- Fixed TypeScript type errors around req.user vs userId/id mismatch
+- Ensured token includes full AuthPayload for proper backend typing
+- Resolved persistent 500 errors, CORS/cookie issues, and type conflicts
+
+Suggested Next Steps:
+- Add persistent header with nav buttons (Home, Profile, Logout)
+- Add frontend logout button that calls /api/auth/logout and redirects
+- Protect /profile so it redirects to /login if not authenticated
+- Show avatar + XP bar to make profile feel more alive
