@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//
+// ENUMS
+//
+enum UserStatus {
+  ACTIVE
+  BANNED
+  DELETED
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum TransactionType {
+  BOOK_SALE
+  OTHER
+}
+
+//
+// MODELS
+//
+model User {
+  id          Int        @id @default(autoincrement())
+  email       String     @unique
+  username    String     @unique
+  name        String?
+  password    String
+  displayName String
+  status      UserStatus @default(ACTIVE)
+  isSeller    Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  avatarUrl   String?
+
+  listings    Listing[]
+  transactions Transaction[] @relation("UserTransactions")
+}
+
+model Book {
+  id          Int       @id @default(autoincrement())
+  title       String
+  author      String
+  isbn        String?
+  description String?
+  imageUrl    String?
+  createdAt   DateTime  @default(now())
+
+  listings    Listing[]
+
+  @@index([title, author])
+  @@index([createdAt])
+}
+
+model Listing {
+  id         Int        @id @default(autoincrement())
+  price      Float
+  quantity   Int        @default(1)
+  condition  String
+  available  Boolean    @default(true)
+  createdAt  DateTime   @default(now())
+  imageUrl   String?
+
+  seller     User       @relation(fields: [sellerId], references: [id])
+  sellerId   Int
+  book       Book       @relation(fields: [bookId], references: [id])
+  bookId     Int
+  transactions Transaction[]
+
+  @@index([sellerId, createdAt])
+  @@index([bookId])
+  @@index([price])
+  @@index([available])
+}
+
+model Transaction {
+  id         Int               @id @default(autoincrement())
+  createdAt  DateTime          @default(now())
+  amount     Float
+  stripeId   String
+  status     TransactionStatus @default(PENDING)
+  type       TransactionType   @default(BOOK_SALE)
+
+  buyer      User      @relation("UserTransactions", fields: [buyerId], references: [id])
+  buyerId    Int
+  listing    Listing   @relation(fields: [listingId], references: [id])
+  listingId  Int
+
+  @@index([buyerId, createdAt])
+  @@index([listingId])
+  @@index([status])
+}
+
